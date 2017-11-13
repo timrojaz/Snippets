@@ -17,9 +17,8 @@ Function Select-FromList {
     Do {
         $PickNum = Read-Host "Please select the number of the item to use"
         If ($PickNum -ne "x") {If ($Picknum.length -ne $Length) {Do {$PickNum = "0$PickNum"}Until($Picknum.Length -eq $Length)}}
-        $Value = $PickList | Where-Object {$_.Number -eq $PickNum}
     }
-    Until($Value -ne $null -or $picknum -eq "x")
+    Until(($PickList | Where-Object {$_.Number -eq $PickNum}) -ne $null -or $picknum -eq "x")
     $Pick = $PickList | Where-Object {$_.Number -eq $PickNum}
     Return $Pick.Item
 }#End Select-FromList
