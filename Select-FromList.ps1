@@ -5,162 +5,39 @@ Function Select-FromList {
     $PickList = @()
     $Count = 1
     ForEach ($Item in $Items) {
-        $PickItem = ""  | Select-Object Number, Name, Item
-        $PickItem.Number = $Count++
+        $PickItem = ""  | Select-Object Option, Name, Item
+        $PickItem.Option = $Count++
         $PickItem.Name = $Item.Name
         $PickItem.Item = $Item.Item
         $PickList += $PickItem
     }
-    $PickList | Format-Table Number, Name, Item -AutoSize | Out-Host    
+    #Reselect option
+    $PickItem = "" | Select-Object Option, Name, Item
+    $PickItem.Option = "R"
+    $PickItem.Name = "Restart selection"
+    $PickItem.Item = " "
+    $PickList += $PickItem
+    #List options
+    $PickList | Format-Table Option, Name, Item -AutoSize | Out-Host    
     $Length = ([string]$PickList.Count).Length
     If ($Length -eq 1) {$Length = 2}
     Do {
-        $PickNum = Read-Host "Please select the number of the item to use"
-        If ($PickNum -ne "x") {If ($Picknum.length -ne $Length) {Do {$PickNum = "0$PickNum"}Until($Picknum.Length -eq $Length)}}
+        Write-Host "Note: (R to selection)"
+        $PickNum = Read-Host "Please select the option of the item to use"
+        If ($PickNum -ne "r") {If ($Picknum.length -lt $Length) {Do {$PickNum = "0$PickNum"}Until($Picknum.Length -eq $Length)}}
     }
-    Until(($PickList | Where-Object {$_.Number -eq $PickNum}) -ne $null -or $picknum -eq "x")
-    $Pick = $PickList | Where-Object {$_.Number -eq $PickNum}
-    Return $Pick.Item
+    Until(($PickList | Where-Object {$_.Option -eq $PickNum}) -ne $null -or $picknum -eq "r")
+    If ($PickNum -eq "r"){$Pick = $null}
+    Else {$Pick = $PickList | Where-Object {$_.Option -eq $PickNum}}
+    Return $Pick
 }#End Select-FromList
 
 #Test function with items:
-$lt10items = @(
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}
-)
-$ge10items = @(
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}
-)
-
-$ge100items = @(
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"},
-    [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"},
-    [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"},
-    [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"},
-    [pscustomobject]@{Name = "Windows 2012 R2"; Item = "windows2012R2.iso"},
-    [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"},
-    [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"},
-    [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"},
-    [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"},
-    [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},
-    [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"},
-    [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"},
-    [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}
-)
-
-$Pick = Select-FromList -Items $ge100items
+Do {
+    $lt10items = @([pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"})
+    $ge10items = @([pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"},[pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"})
+    $ge100items = @([pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"}, [pscustomobject]@{Name = "Windows 2008"; Item = "windows2008.iso"}, [pscustomobject]@{Name = "Windows 2008 R2"; Item = "windows2008R2.iso"}, [pscustomobject]@{Name = "Windows 2012"; Item = "windows2012.iso"}, [pscustomobject]@{Name = "Windows 2016"; Item = "windows2016.iso"}, [pscustomobject]@{Name = "SLES11"; Item = "SLES11.iso"}, [pscustomobject]@{Name = "SLES12"; Item = "SLES12.iso"}, [pscustomobject]@{Name = "RHEL6"; Item = "RHEL6.iso"}, [pscustomobject]@{Name = "RHEL7"; Item = "RHEL7.iso"}, [pscustomobject]@{Name = "VMWARE 5.5"; Item = "ESX55.iso"}, [pscustomobject]@{Name = "VMWARE 6"; Item = "ESX6.iso"}, [pscustomobject]@{Name = "VMWARE 6.5"; Item = "ESX65.iso"})
+    $Pick = Select-FromList -Items $ge100items
+}Until($Pick -ne $null)
 Write-Host "Item picked: " -NoNewLine -Foregroundcolor White
-Write-Host $Pick -ForegroundColor Cyan
+Write-Host $Pick.Item -ForegroundColor Cyan
